@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def delete_data(path):
     try:
         os.remove(path)
@@ -9,6 +10,7 @@ def delete_data(path):
     except OSError as e:
         print(f"!#!Fail to delete {path} - {e}")
         return 0
+
 
 def read_data(path):
     try:
@@ -22,7 +24,8 @@ def read_data(path):
         print(f"!#!Fail to open {path} - {e}")
         return 0
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     PATH = r"C:\Users\ruogan\Downloads\ad_xpaths.json"
     read_data(PATH)
     # delete_data(PATH)
