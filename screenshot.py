@@ -1,12 +1,11 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 import time
 
 
 def page_screenshot(page_url, save_path):  # 输入url和保存路径,将url对应的网页截图存储到对应路径.
 
     # 配置 Chrome 开启的模式，headless是无界面模式,否则截不了全页面，只能截到你电脑的高度
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('headless')
     driver = webdriver.Chrome(options=chrome_options)
 

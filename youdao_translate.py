@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from print_element import print_element
-from selenium.webdriver.common.keys import Keys
 from time import sleep
 import sys
 
@@ -39,8 +38,8 @@ def youdao_translate(str):
     if DEBUG:
         print_element(input_div)
     sleep(5)
-    output_div = driver.find_element(By.XPATH,
-                                     "/html/body/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div[3]/div[2]/div[1]")
+    output_div = driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div[3]/div[2]/div[1]")
+
     if DEBUG:
         print_element(output_div)
     output_text=output_div.text
