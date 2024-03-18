@@ -37,12 +37,12 @@ def page_screenshot(page_url, save_path):  # 输入url和保存路径,将url对�
 #
 
 if __name__ == '__main__':
-    start_time = time.time()
+    # start_time = time.time()
 
     url = 'https://www.sina.com.cn'
     pic_name = r'./pics/test_screen.png'
     page_screenshot(page_url=url, save_path=pic_name)
-    end_time = time.time()
-    execution_time = end_time - start_time
-    print(f"the script took {execution_time:.2f}s to execute")
+    # end_time = time.time()
+    # execution_time = end_time - start_time
+    # print(f"the script took {execution_time:.2f}s to execute")
     exit(0)
