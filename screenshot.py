@@ -42,7 +42,4 @@ if __name__ == '__main__':
     url = 'https://www.sina.com.cn'
     pic_name = r'./pics/test_screen.png'
     page_screenshot(page_url=url, save_path=pic_name)
-    # end_time = time.time()
-    # execution_time = end_time - start_time
-    # print(f"the script took {execution_time:.2f}s to execute")
     exit(0)

@@ -6,11 +6,13 @@ import json
 import os
 from print_element import print_element
 from screenshot import page_screenshot
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 PATH = r"C:\Users\ruogan\Downloads\ad_xpaths.json"
 
 
-def mkdir(directory_path):
+def mkdir(directory_path):# 在指定路径创建文件夹.
     try:
         os.makedirs(directory_path)
         print(f"文件夹 '{directory_path}' 创建成功")
@@ -66,16 +68,20 @@ def check_url(check_url):
         return False
 
 
+
 if __name__ == "__main__":
     delete_data(PATH)
-    page_url = 'https://www.sina.com.cn'
+    page_url = 'https://www.sina.com.cn/'
     # save_path = r'./pics/test_screen.png'
     options = webdriver.ChromeOptions()
     options.add_extension(r'F:\插件开发\workplace\test_3_7.crx')
     driver = webdriver.Chrome(options=options)
     driver.get(page_url)
     driver.maximize_window()
+    # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # slow_scroll_to_bottom(driver)
     time.sleep(20)
+
 
     # 读取iframe_urls
     iframe_urls = []
@@ -83,15 +89,19 @@ if __name__ == "__main__":
     for i in range(0, len(data)):
         xpath = data[i]
         print(f"----------------\n{i}:")
-        print(xpath)
-        ad_element = driver.find_element(By.XPATH, xpath)
-        # print(f"xpath:{xpath}")
-        # print_element(ad_element)
+        # print(xpath)
+        try:
+            ad_element = driver.find_element(By.XPATH, xpath)
+        except:
+            print(f"fail to find xpath:{xpath}")
+            continue
+        print(f"xpath:{xpath}")
+        print_element(ad_element)
         attributes = ad_element.get_property("attributes")
         for attribute in attributes:
             flag = 0
             if (attribute['name'] == 'src'):
-                # print(attribute['name'], ":", attribute['value'])
+                print(attribute['name'], ":", attribute['value'])
                 print(attribute['value'])
                 iframe_urls.append(attribute['value'])
                 flag = 1
@@ -119,7 +129,8 @@ if __name__ == "__main__":
         if url.startswith('javascript:'):
             print(f"not a URL: {url}")
             continue
-        url = 'https://' + url
+        if not (url.startswith('http://') or url.startswith('https://')):
+            url = 'https://' + url
         if check_url(url):
             save_path = f"{dir_url}/{i}.png"
             page_screenshot(url, save_path)
