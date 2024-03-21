@@ -132,8 +132,6 @@ def test(id,page_url):
     driver.maximize_window()
     # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # slow_scroll_to_bottom(driver)
-    time.sleep(20)
-
 
     # 读取iframe_urls
     iframe_urls = []
@@ -141,10 +139,10 @@ def test(id,page_url):
     j=0
     while data==None:
         j+=1
-        if j>5:
+        if j>10:
             print("time out ")
             return
-        time.sleep(10)
+        time.sleep(5)
         data=read_data(PATH)
         print("no data..wait..")
     for i in range(0, len(data)):

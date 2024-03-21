@@ -7,3 +7,5 @@ def print_element(input):# 输入一个查找返回的remote webelement,输出�
     #     print("text:",input.text)
     # except:
     #     print("text:","none")
+    for attribute in attributes:
+        print(f"{attribute['name']}:{attribute['value']}")
