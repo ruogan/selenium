@@ -1,5 +1,5 @@
 # 打开一个iframe的src url,模拟点击iframe,找寻新出现的句柄,转换到对应句柄,输出url.
-
+# 暂时弃用.
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time

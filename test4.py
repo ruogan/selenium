@@ -1,5 +1,6 @@
 # 读取tranco的网站并自动化测试:
 # 访问页面中的各个广告iframe元素的src url,并截图保存在对应文件夹中.
+# 暂时弃用.效果不好.
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time

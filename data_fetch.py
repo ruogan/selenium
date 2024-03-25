@@ -1,5 +1,4 @@
-# 读取tranco的网站并自动化测试:
-# 访问页面中的各个广告iframe元素的src url,并截图保存在对应文件夹中.
+# 批量访问网页,抓取广告截图到./test/中.并将相关信息记录在./data.csv中.
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
@@ -18,7 +17,15 @@ pic_num = 0
 def get_landingpage_url(driver,element):
     original_handle = driver.current_window_handle
     original_handles = driver.window_handles
-    element.click()
+
+    try :
+        print("click()")
+        element.click()
+
+    except:
+        print("js_click()")
+        driver.execute_script("arguments[0].click();", element)  # 使用 JavaScript 来执行点击操作
+
     time.sleep(5)
 
     # 获取点击后标签页的句柄
@@ -33,11 +40,15 @@ def get_landingpage_url(driver,element):
             break
 
     # 切换到新打开标签页
-    # print(driver.current_url)
+    print("landingpage handle: ",landing_page_handle)
+    if landing_page_handle==None:
+        print("no new tab after click")
+        return None,None
     driver.switch_to.window(landing_page_handle)
     landing_page_url = driver.current_url
     landing_page_title = driver.title
     driver.close()
+    print("switch to original")
     driver.switch_to.window(original_handle)
     return landing_page_url,landing_page_title
 
@@ -96,55 +107,52 @@ def check_url(check_url):
         print(f"Error accessing URL {check_url}: {e}")
         return False
 
-def visit_iframe_url(iframe_url):
-    options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(options=options)
-    driver.get(iframe_url)
-    driver.maximize_window()
-
-    # 获取点击前标签页句柄
-    original_handle = driver.current_window_handle
-    original_handles = driver.window_handles
-    print("----------------------------")
-
-    # 打开新标签页
-    try:
-        iframe = driver.find_element(By.TAG_NAME, 'iframe')
-    except Exception as e:
-        print(f"in iframe url fail to find iframe element:{e}")
-        return None,None
-
-    iframe.click()
-
-    time.sleep(5)
-
-    # 获取点击后标签页的句柄
-    all_window_handles = driver.window_handles
-    # print(all_window_handles)
-
-    # 对比找到新标签页句柄
-    landing_page_handle = None
-    for handle in all_window_handles:
-        if handle not in original_handles:
-            landing_page_handle = handle
-            break
-
-    # 切换到新打开标签页
-    # print(driver.current_url)
-    driver.switch_to.window(landing_page_handle)
-    landing_page_url = driver.current_url
-    landing_page_title = driver.title
-    driver.close()
-    driver.switch_to.window(original_handle)
-    return landing_page_url,landing_page_title
-    # driver.quit()
-    # # driver.close()只能关闭当前句柄,driver.quit()能关闭全部句柄.
+# def visit_iframe_url(iframe_url):
+#     options = webdriver.ChromeOptions()
+#     driver = webdriver.Chrome(options=options)
+#     driver.get(iframe_url)
+#     driver.maximize_window()
+#
+#     # 获取点击前标签页句柄
+#     original_handle = driver.current_window_handle
+#     original_handles = driver.window_handles
+#     print("----------------------------")
+#
+#     # 打开新标签页
+#     try:
+#         iframe = driver.find_element(By.TAG_NAME, 'iframe')
+#     except Exception as e:
+#         print(f"in iframe url fail to find iframe element:{e}")
+#         return None,None
+#
+#     iframe.click()
+#
+#     time.sleep(5)
+#
+#     # 获取点击后标签页的句柄
+#     all_window_handles = driver.window_handles
+#     # print(all_window_handles)
+#
+#     # 对比找到新标签页句柄
+#     landing_page_handle = None
+#     for handle in all_window_handles:
+#         if handle not in original_handles:
+#             landing_page_handle = handle
+#             break
+#     # 切换到新打开标签页
+#     # print(driver.current_url)
+#     driver.switch_to.window(landing_page_handle)
+#     landing_page_url = driver.current_url
+#     landing_page_title = driver.title
+#     driver.close()
+#     driver.switch_to.window(original_handle)
+#     return landing_page_url,landing_page_title
+#     # driver.quit()
+#     # # driver.close()只能关闭当前句柄,driver.quit()能关闭全部句柄.
 
 def test(id,page_url):
     global pic_num
     delete_data(PATH)
-    # page_dir = f'./download/{id}'
-    # mkdir(page_dir)
 
     options = webdriver.ChromeOptions()
     options.add_extension(r'F:\插件开发\workplace\test_3_7.crx')
@@ -155,9 +163,6 @@ def test(id,page_url):
         print(f"Error accessing URL {check_url}: {e}")
         return
     driver.maximize_window()
-    # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    # slow_scroll_to_bottom(driver)
-
 
     data = None
     j=0
@@ -215,34 +220,38 @@ def test(id,page_url):
             print(f"fail to save screenshot :{e}")
             return 1
         driver.switch_to.frame(ad_element)
-        # 查找iframe内所有的<a>标签
+        # 查找iframe内的<a>标签
         try:
             a_tag = driver.find_element(By.TAG_NAME, 'a')
             # print_element(a_tag)
             print('++++++++')
             landing_page_url, landing_page_title = get_landingpage_url(driver,a_tag)
+            if landing_page_url ==None:
+                try:
+                    os.remove(save_path)
+                    pic_num -= 1
+                    print(f"文件 \"{save_path}\" 已成功删除")
+                except OSError as e:
+                    print(f"无法删除文件 {save_path} - {e}")
+                continue
             print(landing_page_url, '\n', landing_page_title)
             print(f"screenshot save in {save_path}")
 
+            # 写入csv文件
             data_row=[]
             data_row.append(id)
-            data_row.append(landing_page_url)
             data_row.append(save_path)
-            # 指定 CSV 文件路径
-            # 将数据行追加到 CSV 文件
+            data_row.append(landing_page_url)
+
             with open(csv_file_path, mode='a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(data_row)
-
             print('++++++++')
-            # img_tags = a_tag.find_elements(By.TAG_NAME, 'img')
-            # for img_tag in img_tags:
-            #     # 打印<img>标签
-            #     print_element(img_tag)
         except Exception as e:
             print(f"error during visit <a :{e}")
             try:
                 os.remove(save_path)
+                pic_num -= 1
                 print(f"文件 \"{save_path}\" 已成功删除")
             except OSError as e:
                 print(f"无法删除文件 {save_path} - {e}")
@@ -268,23 +277,12 @@ def read_data_csv(path):
         return None
 
 if __name__=="__main__":
-    test(1,"https://www.uol.com.br/tilt/noticias/redacao/2023/06/22/a-crise-de-semicondutores-poderia-ter-custado-a-democracia-brasileira.htm")
+    # test(1,"https://www.uol.com.br/tilt/noticias/redacao/2023/06/22/a-crise-de-semicondutores-poderia-ter-custado-a-democracia-brasileira.htm")
 
-    # data2=read_data_csv(r"F:\插件开发\workplace\selenium\test\pythonProject\data\dataset_2.csv")
-    # for i in range (0,len(data2)):
-    #     print(f"{i+1}:{data2[i][1]}")
-    #     page_url=data2[i][1]
-    #     # page_url=f'https://www.{data2[i][1]}'
-    #     test(i+1,page_url)
+    data2=read_data_csv(r"F:\插件开发\workplace\selenium\test\pythonProject\data\dataset_2.csv")
+    for i in range (0,len(data2)):
+        print("////////////////////////////////////////////")
+        print(f"{i+1}:{data2[i][1]}")
+        page_url=data2[i][1]
+        test(i+1,page_url)
 
-# data_row=[]
-# data_row.append('John')
-# data_row.append('30')
-# data_row.append('New York')
-# # 指定 CSV 文件路径
-# # 将数据行追加到 CSV 文件
-# with open(csv_file_path, mode='a', newline='') as file:
-#     writer = csv.writer(file)
-#     writer.writerow(data_row)
-#
-# print("数据已成功追加到 CSV 文件！")
