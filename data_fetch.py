@@ -151,6 +151,7 @@ def check_url(check_url):
 #     # # driver.close()只能关闭当前句柄,driver.quit()能关闭全部句柄.
 
 def test(id,page_url):
+
     global pic_num
     delete_data(PATH)
 
@@ -279,10 +280,12 @@ def read_data_csv(path):
 if __name__=="__main__":
     # test(1,"https://www.uol.com.br/tilt/noticias/redacao/2023/06/22/a-crise-de-semicondutores-poderia-ter-custado-a-democracia-brasileira.htm")
 
-    data2=read_data_csv(r"F:\插件开发\workplace\selenium\test\pythonProject\data\dataset_2.csv")
+    data2=read_data_csv(r"F:\插件开发\workplace\selenium\test\pythonProject\data\tranco_100000.csv")
     for i in range (0,len(data2)):
         print("////////////////////////////////////////////")
         print(f"{i+1}:{data2[i][1]}")
         page_url=data2[i][1]
+        if not (page_url.startswith("http://") or page_url.startswith("https://")):
+            page_url="https://" + page_url
         test(i+1,page_url)
 
